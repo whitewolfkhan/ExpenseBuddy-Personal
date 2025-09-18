@@ -113,20 +113,28 @@ interface PayloadItem {
   color?: string;
 }
 
-interface ChartTooltipContentProps extends React.ComponentProps<typeof RechartsPrimitive.Tooltip>, React.ComponentProps<"div"> {
+// Create a proper interface that doesn't extend conflicting types
+interface ChartTooltipContentProps {
+  // Props from RechartsPrimitive.Tooltip that we need
   active?: boolean;
+  label?: React.ReactNode;
+  
+  // Our custom props
   payload?: PayloadItem[];
   className?: string;
   indicator?: "line" | "dot" | "dashed";
   hideLabel?: boolean;
   hideIndicator?: boolean;
-  label?: React.ReactNode;
   labelFormatter?: (value: React.ReactNode, payload: PayloadItem[]) => React.ReactNode;
   labelClassName?: string;
   formatter?: (value: any, name: string, props: any, index: number, payload: any) => React.ReactNode;
   color?: string;
   nameKey?: string;
   labelKey?: string;
+  
+  // HTML div props that we need
+  style?: React.CSSProperties;
+  key?: React.Key;
 }
 
 function ChartTooltipContent({
