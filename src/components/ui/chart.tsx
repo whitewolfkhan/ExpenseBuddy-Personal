@@ -104,6 +104,31 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+// Define proper types for the tooltip content props
+interface PayloadItem {
+  name?: string;
+  value?: any;
+  payload?: any;
+  dataKey?: string;
+  color?: string;
+}
+
+interface ChartTooltipContentProps extends React.ComponentProps<typeof RechartsPrimitive.Tooltip>, React.ComponentProps<"div"> {
+  active?: boolean;
+  payload?: PayloadItem[];
+  className?: string;
+  indicator?: "line" | "dot" | "dashed";
+  hideLabel?: boolean;
+  hideIndicator?: boolean;
+  label?: React.ReactNode;
+  labelFormatter?: (value: React.ReactNode, payload: PayloadItem[]) => React.ReactNode;
+  labelClassName?: string;
+  formatter?: (value: any, name: string, props: any, index: number, payload: any) => React.ReactNode;
+  color?: string;
+  nameKey?: string;
+  labelKey?: string;
+}
+
 function ChartTooltipContent({
   active,
   payload,
@@ -118,14 +143,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
-    hideLabel?: boolean
-    hideIndicator?: boolean
-    indicator?: "line" | "dot" | "dashed"
-    nameKey?: string
-    labelKey?: string
-  }) {
+}: ChartTooltipContentProps) {
   const { config } = useChart()
 
   const tooltipLabel = React.useMemo(() => {
@@ -182,11 +200,11 @@ function ChartTooltipContent({
         {payload.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
-          const indicatorColor = color || item.payload.fill || item.color
+          const indicatorColor = color || item.payload?.fill || item.color
 
           return (
             <div
-              key={item.dataKey}
+              key={item.dataKey || index}
               className={cn(
                 "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
                 indicator === "dot" && "items-center"
@@ -275,13 +293,13 @@ function ChartLegendContent({
         className
       )}
     >
-      {payload.map((item) => {
+      {payload.map((item, index) => {
         const key = `${nameKey || item.dataKey || "value"}`
         const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
         return (
           <div
-            key={item.value}
+            key={item.value || index}
             className={cn(
               "[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3"
             )}
